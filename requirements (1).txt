@@ -4,4 +4,4 @@ pillow
 numpy
 matplotlib
 opencv-python-headless
-gdown  # optional, for downloading model from Google Drive
+gdown
