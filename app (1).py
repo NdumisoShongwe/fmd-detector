@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import cv2
 from PIL import Image
 import os
+import gdown
 
 # ------------------------------------------------------------
 # 0. Download the model if not present
@@ -13,20 +14,11 @@ import os
 model_path = 'mobileNetV2_FMD.h5'
 if not os.path.exists(model_path):
     with st.spinner("Downloading model..."):
-        # Replace with your actual model URL or Google Drive file ID
-        # Example for Google Drive (requires gdown)
-        # import gdown
-        # url = 'https://drive.google.com/uc?id=YOUR_FILE_ID'
-        # gdown.download(url, model_path, quiet=False)
-        #
-        # If using a direct download link, you can use requests:
-        # import requests
-        # r = requests.get("https://example.com/model.h5", stream=True)
-        # with open(model_path, 'wb') as f:
-        #     for chunk in r.iter_content(chunk_size=8192):
-        #         f.write(chunk)
-        st.warning("Model file not found. Please ensure it is in the working directory or update the download logic.")
-        st.stop()
+        # Replace with your Google Drive file ID
+        file_id = 'YOUR_FILE_ID'   # e.g., '1abc123...'
+        url = f'https://drive.google.com/uc?id={file_id}'
+        gdown.download(url, model_path, quiet=False)
+        # If using a direct download URL, you could use requests instead
 
 # ------------------------------------------------------------
 # 1. Load the model
@@ -49,7 +41,7 @@ def preprocess_image(img):
     return img_array
 
 # ------------------------------------------------------------
-# 3. Grad‑CAM function
+# 3. Grad‑CAM function (works with Keras model)
 # ------------------------------------------------------------
 def get_gradcam_heatmap(model, img_array, last_conv_layer_name='Conv_1'):
     base_model = model.layers[0]
@@ -84,28 +76,18 @@ def overlay_heatmap(img, heatmap):
 def get_advice(pred_class, confidence):
     if pred_class == 1:
         return (
-            "**⚠️ FMD DETECTED**
-
-"
-            "1. Isolate the affected animal immediately.
-"
-            "2. Disinfect your hands, clothing, and equipment.
-"
-            "3. Do not move any cattle on or off the farm.
-"
-            "4. Provide soft feed and clean water.
-"
+            "**⚠️ FMD DETECTED**\n\n"
+            "1. Isolate the affected animal immediately.\n"
+            "2. Disinfect your hands, clothing, and equipment.\n"
+            "3. Do not move any cattle on or off the farm.\n"
+            "4. Provide soft feed and clean water.\n"
             "5. Contact a veterinarian or extension officer immediately."
         )
     else:
         return (
-            "**✅ HEALTHY**
-
-"
-            "No signs of Foot and Mouth Disease detected.
-"
-            "Continue routine monitoring and maintain good biosecurity practices.
-"
+            "**✅ HEALTHY**\n\n"
+            "No signs of Foot and Mouth Disease detected.\n"
+            "Continue routine monitoring and maintain good biosecurity practices.\n"
             "If you notice any unusual signs later, consult a veterinarian."
         )
 
